@@ -1,0 +1,7 @@
+Clean Generics
+==============
+
+A generics library for C++ to write clean code with. I decided to write some
+C++ code coming from a C background, but everything seems overcomplicated for
+what is needs to do. I still wanted to write C, but what I've been missing
+is metaprogramming and object-orientation, which I could find in C++.

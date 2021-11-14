@@ -1,0 +1,10 @@
+# Any test files
+/*.cc
+test.*
+
+# Build directory
+/build/
+
+# IDE support
+.idea
+compile_flags.txt
