@@ -31,6 +31,38 @@ public:
 };
 
 /*
+ * Exception class. This is thrown when something goes wrong. For the full text,
+ * use throw CG_EXCEPT(name, message).
+ */
+class Exception : public Object
+{
+public:
+    Exception(String const& name, String const& msg)
+        : m_name(name), m_msg(msg) {}
+
+    Exception(String const& name, String const& msg, char const* file,
+            int line)
+        : m_name(name), m_msg(msg), m_file(file), m_line(line) {}
+
+    String as_string() const override
+    {
+        String msg = "Exception occured - ";
+        msg += m_name + ": " + m_msg + "\n";
+        if (m_line)
+            msg += String("  in ") + m_file + " on line " + m_line;
+        return msg;
+    }
+
+private:
+    String      m_name;
+    String      m_msg;
+    char const* m_file;
+    int         m_line;
+};
+
+#define CG_EXCEPT(NAME, MSG)    Exception(NAME, MSG, __FILE__, __LINE__)
+
+/*
  * Function template class, used for creating function types. For example,
  * to store a simple int add(int a, int b) function, you may use:
  *
