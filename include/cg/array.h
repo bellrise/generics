@@ -30,6 +30,7 @@ public:
     typedef Function<bool, T&> filter_function;
     typedef Function<T, T&, T&> reduce_function;
     typedef Function<String, T&> format_function;
+    typedef Function<T, size_t> producer_function;
 
     Array() : m_size(0), m_len(0), m_array(nullptr) {}
 
@@ -63,6 +64,22 @@ public:
             _alloc(m_size + 1);
 
         m_array[m_len++] = elem;
+    }
+
+    // Extend the array with another.
+    void append(Array const& other)
+    {
+        for (size_t i = 0; i < other.m_len; i++)
+            append(other.m_array[i]);
+    }
+
+    // Get an element at the index.
+    T get(size_t index)
+    {
+        if (index >= m_len)
+            throw CG_EXCEPT("OutOfBounds", String(index) + " is out of bouds");
+
+        return m_array[index];
     }
 
     // Remove all elements from the array.
@@ -138,12 +155,39 @@ public:
         return result;
     }
 
+    // Produce elements and add them to the array. This means the producer will
+    // be called `amount` times, with the index of the element as the first and
+    // only argument. The index will always start from 0.
+    template<typename ProduceFunction>
+    void produce(size_t amount, ProduceFunction&& producer)
+    {
+        for (size_t i = 0; i < amount; i++)
+            append(producer(i));
+    }
+
     // Sum all the objects in the array, using a simple add lamba in reduce().
     T sum() const
     {
         return reduce([] (auto& previous, auto& val) {
             return previous + val;
         });
+    }
+
+    T operator[](size_t index)
+    {
+        return get(index);
+    }
+
+    // Append an element.
+    void operator+=(T const& elem)
+    {
+        append(elem);
+    }
+
+    // Extend this array with another.
+    void operator+=(Array const& other)
+    {
+        append(other);
     }
 
 private:

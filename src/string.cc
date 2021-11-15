@@ -58,6 +58,13 @@ String::String(char value) : m_val(nullptr)
     m_val[0] = value;
 }
 
+String::String(size_t value) : m_val(nullptr)
+{
+    char buf[16];
+    snprintf(buf, 16, "%zu", value);
+    assign(buf);
+}
+
 String::~String()
 {
     _free();
@@ -80,7 +87,7 @@ char const* String::get() const
     return m_val;
 }
 
-bool String::equals(String const &other)
+bool String::equals(String const &other) const
 {
     if (this == &other)
         return true;
@@ -117,12 +124,12 @@ void String::append(char const *other, size_t len)
     m_len += len;
 }
 
-bool String::operator==(String const &other)
+bool String::operator==(String const &other) const
 {
     return equals(other);
 }
 
-String String::operator+(String const &other)
+String String::operator+(String const &other) const
 {
     // Because this may be used outside of the assignment operator, it needs
     // to return a new copy of the string.

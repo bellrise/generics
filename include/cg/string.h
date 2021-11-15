@@ -32,6 +32,7 @@ public:
     String(char value);
     String(int value);
     String(float value);
+    String(size_t value);
 
     // Free all used resources.
     ~String();
@@ -43,7 +44,7 @@ public:
     size_t len() const;
 
     // Returns true if both strings are equal.
-    bool equals(String const& other);
+    bool equals(String const& other) const;
 
     // Returns a new copy of the string.
     String copy() const;
@@ -59,10 +60,10 @@ public:
     void assign(char const* other);
 
     // Comparison operator, calls equals().
-    bool operator==(String const& other);
+    bool operator==(String const& other) const;
 
     // Addition operator, returns a copy of the created string.
-    String operator+(String const& other);
+    String operator+(String const& other) const;
 
     // Append operator, appends other string to the existing string.
     void operator+=(String const& other);
