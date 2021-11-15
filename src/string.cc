@@ -87,6 +87,14 @@ char const* String::get() const
     return m_val;
 }
 
+char String::at(size_t index) const
+{
+    if (index >= m_len)
+        return 0;
+
+    return m_val[index];
+}
+
 bool String::equals(String const &other) const
 {
     if (this == &other)
@@ -124,25 +132,6 @@ void String::append(char const *other, size_t len)
     m_len += len;
 }
 
-bool String::operator==(String const &other) const
-{
-    return equals(other);
-}
-
-String String::operator+(String const &other) const
-{
-    // Because this may be used outside of the assignment operator, it needs
-    // to return a new copy of the string.
-    String new_str(m_val);
-    new_str.append(other);
-    return new_str;
-}
-
-void String::operator+=(const String &other)
-{
-    append(other.m_val);
-}
-
 void String::assign(String const &other)
 {
     _free();
@@ -163,9 +152,33 @@ void String::assign(char const *other)
     assign(String(other));
 }
 
+bool String::operator==(String const &other) const
+{
+    return equals(other);
+}
+
+String String::operator+(String const &other) const
+{
+    // Because this may be used outside of the assignment operator, it needs
+    // to return a new copy of the string.
+    String new_str(m_val);
+    new_str.append(other);
+    return new_str;
+}
+
+void String::operator+=(const String &other)
+{
+    append(other.m_val);
+}
+
 void String::operator=(String const &other)
 {
     assign(other);
+}
+
+char String::operator[](size_t index) const
+{
+    return at(index);
 }
 
 void String::_alloc(size_t bytes)

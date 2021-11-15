@@ -40,6 +40,9 @@ public:
     // Return the pointer to the string for libc functions.
     char const* get() const;
 
+    // Get a character at the given index. Returns 0 is out of bounds.
+    char at(size_t index) const;
+
     // Return the length of the string.
     size_t len() const;
 
@@ -70,6 +73,9 @@ public:
 
     // Assignment operator.
     void operator=(String const& other);
+
+    // Get a character at the given index. Returns 0 is out of bounds.
+    char operator[](size_t index) const;
 
 private:
     size_t  m_size;
