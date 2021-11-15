@@ -9,9 +9,9 @@
 
 _CG_BEGIN
 
-String::String() : m_size(0), m_len(0), m_val(NULL) {}
+String::String() : m_size(0), m_len(0), m_val(nullptr) {}
 
-String::String(char const *str) : m_val(NULL)
+String::String(char const *str) : m_val(nullptr)
 {
     size_t size;
 
@@ -35,6 +35,27 @@ String::String(String const &str)
     m_val = (char *) malloc(m_size);
     memcpy(m_val, str.m_val, m_len);
     m_val[m_len] = 0;
+}
+
+String::String(int value) : m_val(nullptr)
+{
+    char buf[16];
+    snprintf(buf, 16, "%d", value);
+    assign(buf);
+}
+
+String::String(float value) : m_val(nullptr)
+{
+    char buf[16];
+    snprintf(buf, 16, "%f", value);
+    assign(buf);
+}
+
+String::String(char value) : m_val(nullptr)
+{
+    _alloc(1);
+    m_len = 1;
+    m_val[0] = value;
 }
 
 String::~String()
@@ -125,7 +146,7 @@ void String::assign(String const &other)
     m_size = str.m_size;
     m_len  = str.m_len;
     m_val  = str.m_val;
-    str.m_val  = NULL;
+    str.m_val  = nullptr;
     str.m_len  = 0;
     str.m_size = 0;
 }
@@ -157,7 +178,7 @@ void String::_free()
     m_len  = 0;
     m_size = 0;
     free(m_val);
-    m_val  = NULL;
+    m_val  = nullptr;
 }
 
 _CG_END
