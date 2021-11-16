@@ -28,6 +28,9 @@ public:
     String(char const* str);
     String(String const& str);
 
+    // Move constructor, for an r-value reference.
+    String(String&& str) noexcept;
+
     // Formatting constructors.
     String(char value);
     String(int value);
@@ -73,6 +76,11 @@ public:
 
     // Assignment operator.
     void operator=(String const& other);
+
+    // Move assignment operator, so you can move temporary strings instead of
+    // copying them. This is seen in the Array<T>::append(T&&) method, which
+    // will use the provided move operator instead of copying the value.
+    void operator=(String&& str);
 
     // Get a character at the given index. Returns 0 is out of bounds.
     char operator[](size_t index) const;

@@ -66,6 +66,17 @@ public:
         m_array[m_len++] = elem;
     }
 
+    // Support for moving a value into the array. The move-assignment operator
+    // is called casting the element to T&&. This is basically what std::move
+    // does.
+    void append(T&& elem)
+    {
+        if (m_len >= m_size)
+            _alloc(m_size + 1);
+
+        m_array[m_len++] = (T&&) elem;
+    }
+
     // Extend the array with another.
     void append(Array const& other)
     {

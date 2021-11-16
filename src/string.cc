@@ -11,7 +11,7 @@ _CG_BEGIN
 
 String::String() : m_size(0), m_len(0), m_val(nullptr) {}
 
-String::String(char const *str) : m_val(nullptr)
+String::String(char const* str) : m_val(nullptr)
 {
     size_t size;
 
@@ -26,7 +26,7 @@ String::String(char const *str) : m_val(nullptr)
     m_val[m_len] = 0;
 }
 
-String::String(String const &str)
+String::String(String const& str)
 {
     // The copy constructor also needs to copy the m_val allocation.
     m_len = str.m_len;
@@ -35,6 +35,17 @@ String::String(String const &str)
     m_val = (char *) malloc(m_size);
     memcpy(m_val, str.m_val, m_len);
     m_val[m_len] = 0;
+}
+
+String::String(String&& str) noexcept
+    : m_size(str.m_size), m_len(str.m_len), m_val(str.m_val)
+{
+    // Moving the temporary string to this string will stop it from copying,
+    // making it faster and more memory efficient because only 1 instance of
+    // the string actually will exist.
+    str.m_val  = nullptr;
+    str.m_len  = 0;
+    str.m_size = 0;
 }
 
 String::String(int value) : m_val(nullptr)
@@ -95,7 +106,7 @@ char String::at(size_t index) const
     return m_val[index];
 }
 
-bool String::equals(String const &other) const
+bool String::equals(String const& other) const
 {
     if (this == &other)
         return true;
@@ -111,17 +122,17 @@ String String::copy() const
     return String(*this);
 }
 
-void String::append(String const &other)
+void String::append(String const& other)
 {
     append(other.m_val);
 }
 
-void String::append(char const *other)
+void String::append(char const* other)
 {
     append(other, strlen(other));
 }
 
-void String::append(char const *other, size_t len)
+void String::append(char const* other, size_t len)
 {
     // Append a C-style string to this string. If the string cannot fit, it
     // will allocate another CG_STRING_ALLOC_G * n bytes to fit the string.
@@ -132,7 +143,7 @@ void String::append(char const *other, size_t len)
     m_len += len;
 }
 
-void String::assign(String const &other)
+void String::assign(String const& other)
 {
     _free();
 
@@ -147,17 +158,17 @@ void String::assign(String const &other)
     str.m_size = 0;
 }
 
-void String::assign(char const *other)
+void String::assign(char const* other)
 {
     assign(String(other));
 }
 
-bool String::operator==(String const &other) const
+bool String::operator==(String const& other) const
 {
     return equals(other);
 }
 
-String String::operator+(String const &other) const
+String String::operator+(String const& other) const
 {
     // Because this may be used outside of the assignment operator, it needs
     // to return a new copy of the string.
@@ -166,14 +177,28 @@ String String::operator+(String const &other) const
     return new_str;
 }
 
-void String::operator+=(const String &other)
+void String::operator+=(const String& other)
 {
     append(other.m_val);
 }
 
-void String::operator=(String const &other)
+void String::operator=(String const& other)
 {
     assign(other);
+}
+
+void String::operator=(String&& str)
+{
+    // Move the string into the current string.
+    _free();
+
+    m_val  = str.m_val;
+    m_len  = str.m_len;
+    m_size = str.m_size;
+
+    str.m_size = 0;
+    str.m_len  = 0;
+    str.m_val  = nullptr;
 }
 
 char String::operator[](size_t index) const
@@ -184,6 +209,11 @@ char String::operator[](size_t index) const
 void String::_alloc(size_t bytes)
 {
     size_t alloc_size;
+
+    if (!bytes) {
+        _free();
+        return;
+    }
 
     alloc_size = bytes - (bytes % CG_STRING_ALLOC_G);
     alloc_size += CG_STRING_ALLOC_G;
