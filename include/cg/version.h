@@ -17,4 +17,5 @@
 #define _CG_BEGIN       namespace cg {
 #define _CG_END         };
 
+
 #endif /* CG_VERSION_H */

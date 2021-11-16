@@ -1,5 +1,5 @@
 
-FLAGS := -Wall -Wextra -fsanitize=address -Iinclude -std=c++17
+FLAGS := -Wall -Wextra -fsanitize=address -Iinclude -std=c++17 -DCG_DEBUG
 
 test:
 	mkdir -p build

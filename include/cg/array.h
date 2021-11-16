@@ -20,7 +20,8 @@ _CG_BEGIN
 
 /*
  * This array is a dynamic collection of elements, which you can append & remove
- * elements, sort, map, filter & reduce them.
+ * elements, sort, map, filter & reduce them. All the code needs to be in the
+ * header, because of the template.
  */
 template<typename T>
 class Array : public Object
@@ -119,7 +120,9 @@ public:
         return result + "]";
     }
 
-    // Formatter from Genric
+    // To make an Array printable, the default as_string() method is overriden
+    // with a call to the Array as_string method with a custom formatter, which
+    // will turn each element into a string.
     String as_string() const override
     {
         return as_string([] (auto& val) {
@@ -152,7 +155,8 @@ public:
     }
 
     // Reduce the array into a single value of the type. Each call of the reduce
-    // function will pass the already collected value and the current value.
+    // function will pass the already collected value and the current value. If
+    // you just want to add all the elements up, see Array<T>::sum().
     template<typename ReduceFunction>
     T reduce(ReduceFunction&& reducer) const
     {
@@ -177,6 +181,8 @@ public:
     }
 
     // Sum all the objects in the array, using a simple add lamba in reduce().
+    // Note that if T does not provide a operator+ which returns a copy of
+    // itself, this method will not compile.
     T sum() const
     {
         return reduce([] (auto& previous, auto& val) {
@@ -184,6 +190,20 @@ public:
         });
     }
 
+    // Range-based for loop support. C++ requires the begin() and end() methods
+    // for an iterator to work.
+    //
+    //  for (auto i : list)
+    //
+    // The line above is just syntactic sugar for this:
+    //  for (auto it = integers.begin(), end = integers.end(); it != end; ++it)
+    //
+    // You may also iterate over the array using a simple for loop, with size_t
+    // as the counter.
+    T* begin() { return &m_array[0]; }
+    T* end() { return &m_array[m_len]; }
+
+    // Get an element at the given index.
     T operator[](size_t index)
     {
         return get(index);
@@ -207,9 +227,8 @@ private:
     // defined by CG_ARRAY_ALLOC_G.
     void _alloc(size_t slots)
     {
-        if (!slots) {
+        if (!slots)
             return;
-        }
 
         size_t alloc_size;
         T* old_array;

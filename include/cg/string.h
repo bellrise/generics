@@ -22,17 +22,19 @@ _CG_BEGIN
 class String
 {
 public:
+    typedef char char_type;
+
     String();
 
     // These constructors will copy the string and put it in this string.
-    String(char const* str);
+    String(char_type const* str);
     String(String const& str);
 
     // Move constructor, for an r-value reference.
     String(String&& str) noexcept;
 
     // Formatting constructors.
-    String(char value);
+    String(char_type value);
     String(int value);
     String(float value);
     String(size_t value);
@@ -41,7 +43,7 @@ public:
     ~String();
 
     // Return the pointer to the string for libc functions.
-    char const* get() const;
+    char_type const* get() const;
 
     // Get a character at the given index. Returns 0 is out of bounds.
     char at(size_t index) const;
@@ -57,13 +59,27 @@ public:
 
     // Append the other string to this string.
     void append(String const& other);
-    void append(char const* other);
-    void append(char const* other, size_t len);
+    void append(char_type const* other);
+    void append(char_type const* other, size_t len);
 
     // Assigning a different string to this string will remove the original one,
     // and copy the other one it its place.
     void assign(String const& other);
-    void assign(char const* other);
+    void assign(char_type const* other);
+
+    // Move assignment operator, so you can move temporary strings instead of
+    // copying them. This is seen in the Array<T>::append(T&&) method, which
+    // will use the provided move operator instead of copying the value.
+    void assign(String&& str);
+
+    // Iterator support. With these methods, you can use the C++ iterator
+    // semantics to create a range-based for loop for each char like so:
+    //
+    //  for (char c : some_string)
+    //      // Do stuff...
+    //
+    char_type* begin() { return &m_val[0]; }
+    char_type* end() { return &m_val[m_len]; }
 
     // Comparison operator, calls equals().
     bool operator==(String const& other) const;
@@ -77,18 +93,16 @@ public:
     // Assignment operator.
     void operator=(String const& other);
 
-    // Move assignment operator, so you can move temporary strings instead of
-    // copying them. This is seen in the Array<T>::append(T&&) method, which
-    // will use the provided move operator instead of copying the value.
+    // See assign(String&&).
     void operator=(String&& str);
 
     // Get a character at the given index. Returns 0 is out of bounds.
-    char operator[](size_t index) const;
+    char_type operator[](size_t index) const;
 
 private:
-    size_t  m_size;
-    size_t  m_len;
-    char*   m_val;
+    size_t      m_size;
+    size_t      m_len;
+    char_type*  m_val;
 
     // Allocate `bytes` bytes round up to the nearest granularity defined by
     // CG_STRING_ALLOC_G. This may cut the string if the requested size is

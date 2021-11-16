@@ -11,7 +11,7 @@ _CG_BEGIN
 
 String::String() : m_size(0), m_len(0), m_val(nullptr) {}
 
-String::String(char const* str) : m_val(nullptr)
+String::String(char_type const* str) : m_val(nullptr)
 {
     size_t size;
 
@@ -32,7 +32,7 @@ String::String(String const& str)
     m_len = str.m_len;
     m_size = str.m_size;
 
-    m_val = (char *) malloc(m_size);
+    m_val = (char_type *) malloc(m_size);
     memcpy(m_val, str.m_val, m_len);
     m_val[m_len] = 0;
 }
@@ -50,19 +50,19 @@ String::String(String&& str) noexcept
 
 String::String(int value) : m_val(nullptr)
 {
-    char buf[16];
+    char_type buf[16];
     snprintf(buf, 16, "%d", value);
     assign(buf);
 }
 
 String::String(float value) : m_val(nullptr)
 {
-    char buf[16];
+    char_type buf[16];
     snprintf(buf, 16, "%f", value);
     assign(buf);
 }
 
-String::String(char value) : m_val(nullptr)
+String::String(char_type value) : m_val(nullptr)
 {
     _alloc(1);
     m_len = 1;
@@ -71,7 +71,7 @@ String::String(char value) : m_val(nullptr)
 
 String::String(size_t value) : m_val(nullptr)
 {
-    char buf[16];
+    char_type buf[16];
     snprintf(buf, 16, "%zu", value);
     assign(buf);
 }
@@ -86,19 +86,19 @@ size_t String::len() const
     return m_len;
 }
 
-char const* String::get() const
+String::char_type const* String::get() const
 {
     // If the length is 0, we still need to ensure that we pass a null
     // terminated string to libc functions, so this hack returns the address
     // of the m_len variable which will start with a null byte, imitating
     // an empty string.
     if (!m_len)
-        return (char *) &m_len;
+        return (char_type *) &m_len;
 
     return m_val;
 }
 
-char String::at(size_t index) const
+String::char_type String::at(size_t index) const
 {
     if (index >= m_len)
         return 0;
@@ -127,12 +127,12 @@ void String::append(String const& other)
     append(other.m_val);
 }
 
-void String::append(char const* other)
+void String::append(char_type const* other)
 {
     append(other, strlen(other));
 }
 
-void String::append(char const* other, size_t len)
+void String::append(char_type const* other, size_t len)
 {
     // Append a C-style string to this string. If the string cannot fit, it
     // will allocate another CG_STRING_ALLOC_G * n bytes to fit the string.
@@ -158,9 +158,23 @@ void String::assign(String const& other)
     str.m_size = 0;
 }
 
-void String::assign(char const* other)
+void String::assign(char_type const* other)
 {
     assign(String(other));
+}
+
+void String::assign(String&& str)
+{
+    // Move the string into the current string.
+    _free();
+
+    m_val  = str.m_val;
+    m_len  = str.m_len;
+    m_size = str.m_size;
+
+    str.m_size = 0;
+    str.m_len  = 0;
+    str.m_val  = nullptr;
 }
 
 bool String::operator==(String const& other) const
@@ -189,19 +203,10 @@ void String::operator=(String const& other)
 
 void String::operator=(String&& str)
 {
-    // Move the string into the current string.
-    _free();
-
-    m_val  = str.m_val;
-    m_len  = str.m_len;
-    m_size = str.m_size;
-
-    str.m_size = 0;
-    str.m_len  = 0;
-    str.m_val  = nullptr;
+    assign((String&&) str);
 }
 
-char String::operator[](size_t index) const
+String::char_type String::operator[](size_t index) const
 {
     return at(index);
 }
@@ -219,7 +224,7 @@ void String::_alloc(size_t bytes)
     alloc_size += CG_STRING_ALLOC_G;
 
     m_size = alloc_size;
-    m_val = (char *) realloc(m_val, m_size);
+    m_val = (char_type *) realloc(m_val, m_size);
     m_val[m_size-1] = 0;
 }
 
