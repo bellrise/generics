@@ -8,8 +8,7 @@
 #ifndef CG_ARRAY_H
 #define CG_ARRAY_H
 
-#include <cg/string.h>
-#include <cg/types.h>
+#include <generics/string.h>
 
 #include <malloc.h>
 #include <string.h>
@@ -24,7 +23,7 @@ _CG_BEGIN
 // header, because of the template.
 //
 template<typename T>
-class Array : public Object
+class Array : public Printable
 {
 public:
     typedef Function<T, T> map_function;
@@ -88,7 +87,7 @@ public:
     T& get(size_t index)
     {
         if (index >= m_len)
-            throw CG_EXCEPT("OutOfBounds", String(index) + " is out of bouds");
+            throw "Index is out of bounds";
 
         return m_array[index];
     }

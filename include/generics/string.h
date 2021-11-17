@@ -8,7 +8,7 @@
 #ifndef CG_STRING_H
 #define CG_STRING_H
 
-#include <cg/version.h>
+#include <generics.h>
 
 #define CG_STRING_ALLOC_G       16
 

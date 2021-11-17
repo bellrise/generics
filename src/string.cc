@@ -1,9 +1,9 @@
 /*
- * Generics
+ * Clean Generics
  *
  * Copyright (C) 2021 bellrise
  */
-#include <cg/string.h>
+#include <generics/string.h>
 #include <string.h>
 #include <malloc.h>
 

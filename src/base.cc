@@ -5,11 +5,14 @@
  *
  * Generic functions.
  */
-#include <cg.h>
+#include <generics.h>
+#include <generics/string.h>
+#include <generics/function.h>
+#include <generics/array.h>
 
 _CG_BEGIN
 
-void print(Object const& val)
+void print(Printable const& val)
 {
     printf("%s\n", val.as_string().get());
 }
