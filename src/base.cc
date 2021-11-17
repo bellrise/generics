@@ -19,6 +19,11 @@ void print(String const& val)
     printf("%s\n", val.get());
 }
 
+void print(void *val)
+{
+    printf("%p\n", val);
+}
+
 void print(float val)
 {
     printf("%f\n", val);

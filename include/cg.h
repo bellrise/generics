@@ -18,6 +18,7 @@ _CG_BEGIN
  */
 void print(Object const& val);
 void print(String const& str);
+void print(void *val);
 void print(float val);
 void print(char val);
 void print(int val);

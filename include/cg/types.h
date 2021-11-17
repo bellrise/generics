@@ -14,11 +14,11 @@
 
 _CG_BEGIN
 
-/*
- * Base class. All generic objects have this as their base class, apart from the
- * String class which this class relies on. Because this is a public class, you
- * may inherit from this class in order to use the print() function.
- */
+//
+// Base class. All generic objects have this as their base class, apart from the
+// String class which this class relies on. Because this is a public class, you
+// may inherit from this class in order to use the print() function.
+//
 class Object
 {
 public:
@@ -30,10 +30,10 @@ public:
     }
 };
 
-/*
- * Exception class. This is thrown when something goes wrong. For the full text,
- * use throw CG_EXCEPT(name, message).
- */
+//
+// Exception class. This is thrown when something goes wrong. For the full text,
+// use throw CG_EXCEPT(name, message).
+//
 class Exception : public Object
 {
 public:
@@ -62,13 +62,13 @@ private:
 
 #define CG_EXCEPT(NAME, MSG)    Exception(NAME, MSG, __FILE__, __LINE__)
 
-/*
- * Function template class, used for creating function types. For example,
- * to store a simple int add(int a, int b) function, you may use:
- *
- *  Function add_function = add;
- *  int result = add_function(2, 4);
- */
+//
+// Function template class, used for creating function types. For example,
+// to store a simple int add(int a, int b) function, you may use:
+//
+//  Function add_function = add;
+//  int result = add_function(2, 4);
+//
 template<typename R, typename... Args>
 class Function : public Object
 {

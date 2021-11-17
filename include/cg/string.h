@@ -39,6 +39,9 @@ public:
     String(float value);
     String(size_t value);
 
+    template<typename E>
+    String(Array<E> const& value) : String(value.as_string()) {}
+
     // Free all used resources.
     ~String();
 
@@ -46,7 +49,7 @@ public:
     char_type const* get() const;
 
     // Get a character at the given index. Returns 0 is out of bounds.
-    char at(size_t index) const;
+    char_type at(size_t index) const;
 
     // Return the length of the string.
     size_t len() const;

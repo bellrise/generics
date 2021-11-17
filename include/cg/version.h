@@ -17,5 +17,18 @@
 #define _CG_BEGIN       namespace cg {
 #define _CG_END         };
 
+_CG_BEGIN
+
+/* Forward-declare all classes. */
+template<typename R, typename... Args> class Function;
+template<typename T> class Array;
+class Exception;
+class String;
+class Object;
+
+/* Forward-declare useful functions. */
+void print(String const& str);
+
+_CG_END
 
 #endif /* CG_VERSION_H */

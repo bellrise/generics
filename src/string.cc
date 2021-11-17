@@ -119,7 +119,16 @@ bool String::equals(String const& other) const
 
 String String::copy() const
 {
-    return String(*this);
+    String str;
+
+    str.m_len  = m_len;
+    str.m_size = m_size;
+
+    // Copy the string contents
+    str.m_val = (char_type *) malloc(m_size);
+    strncpy(str.m_val, m_val, m_len);
+
+    return str;
 }
 
 void String::append(String const& other)
@@ -129,14 +138,22 @@ void String::append(String const& other)
 
 void String::append(char_type const* other)
 {
+    if (!other)
+        return;
+
     append(other, strlen(other));
 }
 
 void String::append(char_type const* other, size_t len)
 {
+    if (!other)
+        return;
+
     // Append a C-style string to this string. If the string cannot fit, it
     // will allocate another CG_STRING_ALLOC_G * n bytes to fit the string.
-    if (len > m_size - m_len - 1)
+    if (!m_size)
+        _alloc(strlen(other));
+    else if (len > m_size - m_len - 1)
         _alloc(m_len + len);
 
     strncpy(m_val + m_len, other, len);

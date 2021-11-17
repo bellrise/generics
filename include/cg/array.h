@@ -18,11 +18,11 @@
 
 _CG_BEGIN
 
-/*
- * This array is a dynamic collection of elements, which you can append & remove
- * elements, sort, map, filter & reduce them. All the code needs to be in the
- * header, because of the template.
- */
+//
+// This array is a dynamic collection of elements, which you can append & remove
+// elements, sort, map, filter & reduce them. All the code needs to be in the
+// header, because of the template.
+//
 template<typename T>
 class Array : public Object
 {
@@ -40,8 +40,7 @@ public:
     Array(Array const& other)
     {
         _alloc(other.m_len);
-        for (size_t i = 0; i < other.m_len; i++)
-            m_array[i] = other.m_array[i];
+        _copy_array<T>(other.m_array, m_array, other.m_len);
 
         m_len = other.m_len;
     }
@@ -86,7 +85,7 @@ public:
     }
 
     // Get an element at the index.
-    T get(size_t index)
+    T& get(size_t index)
     {
         if (index >= m_len)
             throw CG_EXCEPT("OutOfBounds", String(index) + " is out of bouds");
@@ -102,6 +101,17 @@ public:
         m_size  = 0;
         m_len   = 0;
         m_array = nullptr;
+    }
+
+    // Return a copy of the array.
+    Array<T> copy() const
+    {
+        Array<T> new_array;
+        new_array.produce(m_len, [this] (size_t i) {
+            return m_array[i];
+        });
+
+        return new_array;
     }
 
     // Add each element to the string using the given format function.
@@ -200,11 +210,11 @@ public:
     //
     // You may also iterate over the array using a simple for loop, with size_t
     // as the counter.
-    T* begin() { return &m_array[0]; }
-    T* end() { return &m_array[m_len]; }
+    T* begin() const { return &m_array[0]; }
+    T* end() const { return &m_array[m_len]; }
 
     // Get an element at the given index.
-    T operator[](size_t index)
+    T& operator[](size_t index)
     {
         return get(index);
     }
@@ -221,7 +231,28 @@ public:
         append(other);
     }
 
-private:
+    // Assign-copy constructor.
+    void operator=(Array<T> const& other)
+    {
+        clear();
+
+        Array<T> copied = other.copy();
+        operator=((Array<T>&&) copied);
+    }
+
+    // See Array(Array&& other) move constructor
+    void operator=(Array&& other)
+    {
+        m_array = other.m_array;
+        m_size  = other.m_size;
+        m_len   = other.m_len;
+
+        other.m_array = nullptr;
+        other.m_size  = 0;
+        other.m_len   = 0;
+    }
+
+protected:
 
     // Allocate enough slots for the elements, rounding up to the closest value
     // defined by CG_ARRAY_ALLOC_G.
@@ -241,15 +272,57 @@ private:
         m_array   = new T[alloc_size];
 
         if (old_array) {
-            memcpy(m_array, old_array, sizeof(T) * alloc_size);
+            _copy_array<T>(old_array, m_array, m_len);
             delete[] old_array;
         }
     }
+
+    // In order to support different types, the _copy_array method needs to
+    // support a simple array copy for basic C types, and more sophisticated
+    // .copy() routines for types like a String.
+    template<typename E>
+    void _copy_array(E* from, E* to, size_t elems)
+    {
+        memcpy((void*) to, (void*) from, sizeof(E) * elems);
+    }
+
+    template<>
+    void _copy_array(String* from, String* to, size_t elems)
+    {
+        for (size_t i = 0; i < elems; i++)
+            to[i] = from[i].copy();
+    }
+
 
     size_t  m_size;
     size_t  m_len;
     T*      m_array;
 };
+
+// If you want to copy a two or three-dimensional array, the standard .copy()
+// method will unfortunately fail. That is why deep_copy needs to be used for
+// such arrays. Otherwise, it will result in a memcpy-param-overlap, meaning
+// undefined behaviour.
+template<typename T>
+Array<Array<T>> deep_copy(Array<Array<T>> const& source)
+{
+    Array<Array<T>> copy;
+    for (auto const& sublist : source)
+        copy.append(sublist);
+
+    return copy;
+}
+
+// See Array<Array<T>> deep_copy(Array<Array<T>> const&)
+template<typename T>
+Array<Array<Array<T>>> deep_copy(Array<Array<Array<T>>> const& source)
+{
+    Array<Array<Array<T>>> copy;
+    for (auto const& subarray : source)
+        copy.append((Array<Array<T>>&&) deep_copy(subarray));
+
+    return copy;
+}
 
 _CG_END
 
