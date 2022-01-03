@@ -1,7 +1,7 @@
 /*
  * Clean Generics
  *
- * Copyright (C) 2021 bellrise
+ * Copyright (C) 2021-2022 bellrise
  *
  * Array object.
  */
@@ -111,6 +111,18 @@ public:
         });
 
         return new_array;
+    }
+
+    // Set the size of the array. If the current size is larger then the amount
+    // of slots requested, this function will fail. This can help is optimizing
+    // the array, because the amount of slots requested is allocated once, so
+    // no copying and reallocation needs to happen.
+    void set_size(size_t slots) const
+    {
+        if (m_size >= slots)
+            return;
+
+        _alloc(slots);
     }
 
     // Add each element to the string using the given format function.

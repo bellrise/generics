@@ -1,7 +1,7 @@
 /*
  * Clean Generics
  *
- * Copyright (C) 2021 bellrise
+ * Copyright (C) 2021-2022 bellrise
  *
  * Function object.
  */
